@@ -44,18 +44,20 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v1
       with:
-        username: ${{ env.DOCKERHUB_USERNAME }}
-        password: ${{ env.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: SSH to EC2, and run docker container
-      run: |
-        echo "${{ env.AWS_PRIVATE_KEY }}" > key.pem && chmod 600 key.pem
-        ssh -o StrictHostKeyChecking=no -i "key.pem" ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com ' 
-        sudo docker pull abhinavsinha19/basic-express:0.1
-        sudo docker stop basic-express || true &&
-        sudo docker rm basic-express || true &&
-        sudo docker run -d --name basic-express -p 8080:8080 abhinavsinha19/basic-express:0.1 
-        '
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 'ec2-52-66-197-249.ap-south-1.compute.amazonaws.com'
+        username: 'ec2-user'
+        key:  ${{ secrets.AWS_PRIVATE_KEY }}
+        script: |
+          sudo docker pull abhinavsinha19/basic-express:0.1
+          sudo docker stop basic-express || true &&
+          sudo docker rm basic-express || true &&
+          sudo docker run -d --name basic-express -p 8080:8080 abhinavsinha19/basic-express:0.1 
 
 
     # - name: Pull Docker image
