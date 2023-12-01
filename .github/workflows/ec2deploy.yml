@@ -50,8 +50,8 @@ jobs:
     - name: SSH to EC2, and run docker container
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 'ec2-65-2-187-93.ap-south-1.compute.amazonaws.com'
-        username: 'ec2-user'
+        host: ${{ secrets.AWS_HOST }}
+        username: ${{ secrets.AWS_USERNAME }}
         key:  ${{ secrets.AWS_PRIVATE_KEY }}
         script: |
           sudo docker pull abhinavsinha19/basic-express:0.1
