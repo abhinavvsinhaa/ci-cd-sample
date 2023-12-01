@@ -47,21 +47,27 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Set permissions for private key
+    - name: SSH to EC2, and run docker container
       run: |
-        echo "${{ secrets.AWS_PRIVATE_KEY }}" > key.pem
-        chmod 600 key.pem
+        echo "${{ secrets.AWS_PRIVATE_KEY }}" > key && chmod 600 key
+        ssh -o StrictHostKeyChecking=no -i key ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com
 
-    - name: Pull Docker image
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker pull abhinavsinha19/basic-express:0.1'
+        sudo docker pull abhinavsinha19/basic-express:0.1 &&
+        sudo docker stop basic-express || true &&
+        sudo docker rm basic-express || true &&
+        sudo docker run -d --name basic-express -p 8080:8080 abhinavsinha19/basic-express:0.1
 
-    - name: Stop running container
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker stop basic-express || true'
 
-        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker rm basic-express || true'
+    # - name: Pull Docker image
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker pull abhinavsinha19/basic-express:0.1'
 
-    - name: Run new container
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker run -d --name basic-express -p 8080:8080 abhinavsinha19/basic-express:0.1'
+    # - name: Stop running container
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker stop basic-express || true'
+
+    #     ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker rm basic-express || true'
+
+    # - name: Run new container
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-52-66-197-249.ap-south-1.compute.amazonaws.com 'sudo docker run -d --name basic-express -p 8080:8080 abhinavsinha19/basic-express:0.1'
