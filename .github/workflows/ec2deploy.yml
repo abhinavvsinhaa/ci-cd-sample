@@ -50,7 +50,7 @@ jobs:
     - name: SSH to EC2, and run docker container
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 'ec2-52-66-197-249.ap-south-1.compute.amazonaws.com'
+        host: 'ec2-65-2-187-93.ap-south-1.compute.amazonaws.com'
         username: 'ec2-user'
         key:  ${{ secrets.AWS_PRIVATE_KEY }}
         script: |
